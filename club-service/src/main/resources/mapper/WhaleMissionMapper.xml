@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.loserMissionMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.loserMission">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="mission_title" jdbcType="OTHER" property="missionTitle" />
+    <result column="benefit_id" jdbcType="BIGINT" property="benefitId" />
+    <result column="benefit_inventory_id" jdbcType="BIGINT" property="benefitInventoryId" />
+    <result column="mission_descr" jdbcType="OTHER" property="missionDescr" />
+    <result column="mission_icon" jdbcType="OTHER" property="missionIcon" />
+    <result column="mission_img" jdbcType="OTHER" property="missionImg" />
+    <result column="forward_link" jdbcType="OTHER" property="forwardLink" />
+    <result column="priority" jdbcType="INTEGER" property="priority" />
+    <result column="mission_type" jdbcType="VARCHAR" property="missionType" />
+    <result column="valid_begin" jdbcType="TIMESTAMP" property="validBegin" />
+    <result column="valid_end" jdbcType="TIMESTAMP" property="validEnd" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="client_type" jdbcType="VARCHAR" property="clientType" />
+    <result column="client_attaches" jdbcType="VARCHAR" property="clientAttaches" />
+    <result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="utime" jdbcType="TIMESTAMP" property="utime" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="benefit_indicator" jdbcType="VARCHAR" property="benefitIndicator" />
+  </resultMap>
+
+  <select id="getByMissionType" resultMap="BaseResultMap">
+    SELECT *
+    FROM loser_mission a
+           RIGHT OUTER JOIN loser_mission_binding b ON a.id = b.mission_id
+    WHERE b.uid = #{uid}
+    AND a.mission_type = #{missionType}
+    AND a.status = 'ENABLE'
+    AND CURRENT_TIMESTAMP BETWEEN a.valid_begin AND a.valid_end
+  </select>
+</mapper>

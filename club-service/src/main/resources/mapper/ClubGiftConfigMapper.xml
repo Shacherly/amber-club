@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.ClubGiftConfigMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.ClubGiftConfig">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="club_level" jdbcType="INTEGER" property="clubLevel" />
+    <result column="gift_id" jdbcType="BIGINT" property="giftId" />
+    <result column="gift_type" jdbcType="VARCHAR" property="giftType" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="standard_rate" jdbcType="NUMERIC" property="standardRate" />
+    <result column="exclusive_rate" jdbcType="NUMERIC" property="exclusiveRate" />
+    <result column="sort_update_time" jdbcType="TIMESTAMP" property="sortUpdateTime" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="is_effect" jdbcType="BIT" property="isEffect" />
+  </resultMap>
+
+  <sql id="All_Column">
+    id , club_level, gift_id, gift_type, sort, standard_rate, exclusive_rate, sort_update_time,
+        is_effect, created_time, updated_time, create_by, update_by
+  </sql>
+
+  <sql id="Part_Column1">
+    id , club_level, gift_id, gift_type, sort, standard_rate, exclusive_rate, sort_update_time, is_effect
+  </sql>
+
+  <select id="getAllGiftConfigs" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Part_Column1"/>
+    FROM club_gift_config
+    WHERE is_effect = true AND club_level = #{currentLevel}
+    UNION ALL
+    SELECT
+    <include refid="Part_Column1"/>
+    FROM club_gift_config
+    WHERE is_effect = true
+    AND club_level IN (SELECT ccc.club_level_cp FROM club_gift_compare ccc WHERE CCC.club_level = #{currentLevel} AND ccc.is_effect = true)
+  </select>
+</mapper>

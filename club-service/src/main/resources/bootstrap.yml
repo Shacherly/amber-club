@@ -1,0 +1,196 @@
+## 配置中心 配置 start
+loser:
+  confcenter:
+    enabled: true
+#    refreshvalueannotation: true
+    refreshenable: true # 新增是否开启热刷新开关. 默认关闭
+    app:
+      appName: trading-club
+    etcd:
+      endpoints: https://confd-configserver-sit-jp.loserainsider.com
+      username: trading-club-local
+      password: t1gPoMqFDvUk
+
+system-property:
+  blue-loser-accessible: false
+
+server:
+  port: 19000
+  shutdown: graceful
+  servlet:
+    context-path: /club
+  tomcat:
+    accept-count: 100
+    max-connections: 8192
+    threads:
+      max: 200
+      min-spare: 10
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: trading-club-service
+  main:
+    allow-bean-definition-overriding: true
+  lifecycle:
+    timeout-per-shutdown-phase: 10s
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      max-active: 10
+      max-wait: 5000
+      min-idle: 5
+    master:
+      url: jdbc:postgresql://aws-jp-trading-allmodule-pg-nonprod.ckcvjkzxh8bd.ap-northeast-1.rds.amazonaws.com:5432/club_dev?prepareThreshold=0
+      username: club_readwrite_dev
+      password: bNlAv#Pspw6JnBo5DvV3z
+      driver-class-name: org.postgresql.Driver
+    slaver:
+      url: jdbc:postgresql://172.24.247.95:5432/loser?prepareThreshold=0
+      username: readwrite
+      password: .whn_E2D5*)z.h
+      driver-class-name: org.postgresql.Driver
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 940WAzH5CFn^P1c#WVoi6G
+    lettuce:
+      pool:
+        min-idle: 0
+        max-active: 8
+        max-idle: 8
+        max-wait: 5
+        time-between-eviction-runs: 60000
+    database: 8
+    timeout: 5000
+    ssl: true
+
+  kafka:
+    bootstrap-servers: b-2.trading-alltest.7n9wg1.c2.kafka.ap-northeast-1.amazonaws.com:9096,b-3.trading-alltest.7n9wg1.c2.kafka.ap-northeast-1.amazonaws.com:9096,b-1.trading-alltest.7n9wg1.c2.kafka.ap-northeast-1.amazonaws.com:9096
+    consumer:
+      group-id: loser-trading-club-${spring.profiles.active}
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: latest
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 0
+      #batch-size: 16384 #default 16K=16384bytes
+      properties:
+        linger.ms: 200
+#      buffer-memory:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-512
+      ssl.truststore.location: /home/devops/ssl/kafka.client.truststore.jks
+
+topics:
+  group:
+    aceup-manager-sync: loser-trading-aceup-bwc-cm-group-${spring.profiles.active}
+  publisher:
+    club-upgrade: loser-trading-club-upgrade-${spring.profiles.active}
+    user-touch: loser-trading-usercenter-usertouch-${spring.profiles.active}
+  subscriber:
+    aceup-manager-sync: loser-trading-aceup-bwc-cm-${spring.profiles.active}
+    aceup-tag-update: loser-aceup-tag-update-${spring.profiles.active}
+
+
+
+mybatis:
+  configuration:
+    cache-enabled: false
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-handlers-package: com.trading.backend.club.type
+  mapper-locations: classpath:mapper/*.xml
+mapper:
+  mappers: com.loser.backend.club.common.mapper.BaseMapper
+pagehelper:
+  default-count: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    redis:
+      enable: false
+  metrics:
+    tags:
+      application: ${loser.confcenter.app.appName}-${spring.profiles.active}
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      sla:
+        http:
+          server:
+            requests: 1ms,5ms,10ms,50ms,100ms,200ms,500ms,1s,5s
+  server: #prometheus单独端口监控
+    port: 8020
+    servlet:
+      context-path: ${server.servlet.context-path}
+
+#xxl-job配置
+xxl:
+  job.admin.addresses: https://xxljob-admin-dev.loserainsider.com/xxl-job-admin/
+  job.accessToken:
+  job.executor:
+    appname: club-${spring.profiles.active}
+    address:
+    ip: trading-club-svc.trading-${spring.profiles.active}.svc
+    port: 9999
+    logpath: /home/devops/trading-club/log/xxl-job/
+    logretentiondays: 30
+
+trading-club:
+  intraday: false
+  compensate-rate: 10000
+  sync-moment: '0 33 11 ? * *'
+
+remote-call:
+  domain: 'https://internal-gateway-dev.loserainsider.com'
+  aceup:
+    domain: 'https://aceup-sit.loserainsider.com'
+    key: 'trading'
+    secret: 'af19e35f019eab4297435c04aed7b857217a486d'
+    token-url: 'https://aceup-sit.loserainsider.com/server/auth/oauth/token'
+    server:
+      multi-tag-user-page: '/server/tag/tag-user-ref/tag-user/multi-condition/page'
+      single-tag-user-page: '/server/tag/tag-user-ref/tag-user/page'
+      bwc-cm-list: '/server/basedata/bwc-cm/list'
+  coupon-server:
+    coupon-detail: '/coupon/possess/detail'
+    club-possess: '/coupon/internal/v1/club/possess'
+    period-possess: '/coupon/internal/v1/possess/fullscale/acessible'
+  user-server:
+    user-detail: '/user-center/internal/v1/user/profile_batch'
+  earn-server:
+    earn-product-list: '/earn/internal/getProductList'
+    bwc-earn-products: '/earn/internal/listBwcProducts4User'
+
+sensors:
+  log-path: /sensordata/club/${HOSTNAME}-log/service.log
+
+
+notify:
+  template:
+    of-email:
+      first-blue-loser: 'EML03_000045'
+      upgrade-bule-loser: 'EML03_000044'
+    of-short-msg:
+#      holder: ''
+    of-inner-msg:
+#      holder: ''
+    of-push:
+      upgrade-bule-loser: 'PUS03_000026'
+      update-client-manager: 'PUS03_000025'
+
+
+
+

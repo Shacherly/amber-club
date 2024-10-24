@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.AverageMonthlyAssetMapper">
+    <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.AverageMonthlyAsset">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="uid" jdbcType="VARCHAR" property="uid"/>
+        <result column="avg_asset" jdbcType="NUMERIC" property="avgAsset"/>
+        <result column="utime" jdbcType="TIMESTAMP" property="utime"/>
+    </resultMap>
+
+    <select id="get4Evaluate" resultMap="BaseResultMap">
+        SELECT uid, avg_asset
+        FROM average_monthly_asset
+        ORDER BY uid LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <insert id="batchUpsert">
+        INSERT INTO average_monthly_asset (uid, avg_asset)
+        VALUES
+        <foreach collection="records" item="item" separator=",">
+            (#{item.uid}, #{item.avgAsset})
+        </foreach>
+        ON CONFLICT (uid)
+        DO UPDATE SET (avg_asset, utime) = (EXCLUDED.avg_asset, CURRENT_TIMESTAMP)
+    </insert>
+
+</mapper>

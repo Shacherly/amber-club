@@ -1,0 +1,102 @@
+loser:
+  confcenter:
+    enabled: true
+
+server:
+  port: 19000
+  shutdown: graceful
+  servlet:
+    context-path: /club
+  tomcat:
+    accept-count: 100
+    max-connections: 8192
+    threads:
+      max: 200
+      min-spare: 10
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      max-active: 10
+      max-wait: 5000
+      min-idle: 5
+    master:
+      url: jdbc:postgresql://aws-jp-trading-allmodule-pg-nonprod.ckcvjkzxh8bd.ap-northeast-1.rds.amazonaws.com:5432/club_sit?prepareThreshold=0
+      username: club_readwrite_sit
+      password: iTGW3s7Cx&Y7kgucfmDyX
+      driver-class-name: org.postgresql.Driver
+    slaver:
+      url: jdbc:postgresql://172.24.247.129:5432/loser?prepareThreshold=0
+      username: readwrite
+      password: .whn_E2D5*)z.h
+      driver-class-name: org.postgresql.Driver
+
+  redis:
+    host: master.aws-jp-trading-allmodule-redis-nonprod2.8loycm.apne1.cache.amazonaws.com
+    port: 6379
+    password: eMIuCk#RykeeQ9Xc)UWC50
+    #    ssl: true
+    lettuce:
+      pool:
+        min-idle: 0
+        max-active: 8
+        max-idle: 8
+        max-wait: 5
+        time-between-eviction-runs: 60000
+    database: 7
+    timeout: 5000
+
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-512
+      ssl.truststore.location: D:/Projects/trading/kafka.client.truststore.jks
+
+
+mybatis:
+  configuration:
+    cache-enabled: false
+  type-handlers-package: com.trading.backend.club.type
+  mapper-locations: classpath:mapper/*.xml
+mapper:
+  mappers: com.loser.backend.club.common.mapper.BaseMapper
+pagehelper:
+  default-count: true
+
+logging:
+  config: classpath:log/log4j2-sit.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  server: #prometheus单独端口监控
+    port: 8090
+    servlet:
+      context-path: ${server.servlet.context-path}
+
+trading-club:
+  intraday: true
+  compensate-rate: 10000
+  sync-moment: '0 33 11 ? * *'
+
+remote-call:
+  domain: 'https://internal-gateway-sit.loserainsider.com'
+  aceup:
+    domain: 'https://aceup-sit.loserainsider.com'
+    key: 'trading'
+    secret: 'af19e35f019eab4297435c04aed7b857217a486d'
+    token-url: 'https://aceup-sit.loserainsider.com/server/auth/oauth/token'
+
+topics:
+  group:
+    aceup-manager-sync: loser-trading-aceup-bwc-cm-group-sit
+  publisher:
+    club-upgrade: loser-trading-club-upgrade-sit
+    user-touch: loser-trading-usercenter-usertouch-sit
+  subscriber:
+    aceup-manager-sync: loser-trading-aceup-bwc-cm-sit
+

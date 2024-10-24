@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.ClubLevelMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.ClubLevel">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="VARCHAR" property="uid" />
+    <result column="club_level" jdbcType="INTEGER" property="clubLevel" />
+    <result column="club_point" jdbcType="BIGINT" property="clubPoint" />
+    <result column="valid_until" jdbcType="TIMESTAMP" property="validUntil" />
+    <result column="upgrade_time" jdbcType="TIMESTAMP" property="upgradeTime" />
+    <result column="upgrade_read" jdbcType="BIT" property="upgradeRead" />
+    <result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+    <result column="utime" jdbcType="TIMESTAMP" property="utime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="loser_level" jdbcType="INTEGER" property="loserLevel" />
+    <result column="benefit_level" jdbcType="INTEGER" property="benefitLevel" />
+    <result column="loser_until" jdbcType="TIMESTAMP" property="loserUntil" />
+    <result column="first_access" jdbcType="BIT" property="firstAccess" />
+    <result column="loser_upgrade_time" jdbcType="TIMESTAMP" property="loserUpgradeTime" />
+    <result column="loser_upgrade_read" jdbcType="BIT" property="loserUpgradeRead" />
+    <result column="home_first_access" jdbcType="BIT" property="homeFirstAccess" />
+  </resultMap>
+
+  <resultMap id="loserClubDoMap" type="com.loser.backend.club.pojo.loserClub">
+    <result column="avg_asset" jdbcType="NUMERIC" property="avgAsset" />
+    <association property="clubLevel" resultMap="BaseResultMap"/>
+  </resultMap>
+
+  <sql id="loser_Club_Column">
+    id,uid,club_level,club_point,valid_until,upgrade_time,upgrade_read,loser_level,
+    benefit_level,loser_until,first_access,loser_upgrade_time,loser_upgrade_read,avg_asset
+  </sql>
+
+  <select id="getUpgradeConfirm" resultType="java.lang.Boolean">
+    SELECT upgrade_read FROM club_level WHERE uid = #{uid} AND club_level > 0
+  </select>
+
+  <insert id="batchUpsertClubLevel">
+    INSERT INTO club_level (uid,club_level,club_point,valid_until,upgrade_time,upgrade_read,
+    loser_level,benefit_level,loser_until,loser_upgrade_time,loser_upgrade_read)
+    VALUES
+    <foreach collection="records" item="item" separator=",">
+      (#{item.uid},#{item.clubLevel},#{item.clubPoint},#{item.validUntil},#{item.upgradeTime},#{item.upgradeRead},
+      #{item.loserLevel},#{item.benefitLevel},#{item.loserUntil},#{item.loserUpgradeTime},#{item.loserUpgradeRead})
+    </foreach>
+    ON CONFLICT (uid)
+    DO UPDATE SET (club_point,club_level,valid_until,upgrade_time,upgrade_read,
+    loser_level,benefit_level,loser_until,loser_upgrade_time,loser_upgrade_read)
+    = (EXCLUDED.club_point,EXCLUDED.club_level,EXCLUDED.valid_until,COALESCE(EXCLUDED.upgrade_time,club_level.upgrade_time),EXCLUDED.upgrade_read,
+    EXCLUDED.loser_level,EXCLUDED.benefit_level,EXCLUDED.loser_until,COALESCE(EXCLUDED.loser_upgrade_time,club_level.loser_upgrade_time),EXCLUDED.loser_upgrade_read)
+  </insert>
+
+  <select id="getloserClub" resultMap="loserClubDoMap">
+    SELECT a.*, b.avg_asset
+    FROM club_level a LEFT OUTER JOIN average_monthly_asset b
+    ON a.uid = b.uid
+    WHERE a.uid = #{uid}
+  </select>
+
+  <select id="getloserClubs" resultMap="loserClubDoMap">
+    <if test="!(uids == null or uids.size == 0)">
+      SELECT a.*, b.avg_asset
+      FROM club_level a LEFT OUTER JOIN average_monthly_asset b
+      ON a.uid = b.uid
+      WHERE a.uid IN
+      <foreach collection="uids" item="item" separator="," open="(" close=")">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+
+</mapper>

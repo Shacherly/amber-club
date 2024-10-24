@@ -1,0 +1,130 @@
+loser:
+  confcenter:
+    enabled: true
+    app:
+      appName: trading-club
+
+server:
+  port: 8010
+  shutdown: graceful
+  servlet:
+    context-path: /club
+  tomcat:
+    accept-count: 100
+    max-connections: 8192
+    threads:
+      max: 200
+      min-spare: 10
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      max-active: 10
+      max-wait: 5000
+      min-idle: 5
+    master:
+      url: jdbc:postgresql://jp-trading-club-pg-prod.cluster-ckcvjkzxh8bd.ap-northeast-1.rds.amazonaws.com:1433/club?prepareThreshold=0
+      username: readwrite
+      password: DFD6gjdfdf_DF78jkdf76oy
+      driver-class-name: org.postgresql.Driver
+    slaver:
+      url: jdbc:postgresql://pgm-0iwr7280339e7i8m75650.pgsql.japan.rds.aliyuncs.com:5432/loser?prepareThreshold=0
+      username: readloser
+      password: sd7TGtsd_sdYG6f7HtG
+      driver-class-name: org.postgresql.Driver
+
+  redis:
+    # master.aws-jp-trading-club-redis-prod.8loycm.apne1.cache.amazonaws.com:6379
+    host: master.aws-jp-trading-club-redis-prod.8loycm.apne1.cache.amazonaws.com
+    port: 6379
+    password: pxWmgJlD7Vih0WMYJYr08m
+    lettuce:
+      pool:
+        min-idle: 0
+        max-active: 8
+        max-idle: 8
+        max-wait: 5
+        time-between-eviction-runs: 60000
+    database: 0
+    timeout: 5000
+    ssl: true
+
+  kafka:
+    bootstrap-servers: b-1.trading-prod-kaf.i6c4mm.c2.kafka.ap-northeast-1.amazonaws.com:9096,b-3.trading-prod-kaf.i6c4mm.c2.kafka.ap-northeast-1.amazonaws.com:9096,b-2.trading-prod-kaf.i6c4mm.c2.kafka.ap-northeast-1.amazonaws.com:9096
+    consumer:
+      group-id: loser-trading-club-prod
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 0
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-512
+      ssl.truststore.location: /home/devops/ssl/kafka.client.truststore.jks
+
+
+topics:
+  publisher:
+    club-upgrade: 'loser-trading-club-upgrade-prod'
+  subscriber:
+    aaaa: 'tesadsd12rfw'
+
+
+#xxl-job配置
+xxl:
+  job.admin.addresses: http://trading-xxl-job-admin.trading.svc:8080/xxl-job-admin
+  job.accessToken: SAewvZhn7e7fFNjG4j
+  job.executor:
+    appname: club-prod
+    address:
+    ip: trading-club-svc.trading.svc
+    port: 9999
+    logpath: /home/devops/trading-club/log/xxl-job/
+    logretentiondays: 30
+
+mybatis:
+  configuration:
+    cache-enabled: false
+  type-handlers-package: com.trading.backend.club.type
+  mapper-locations: classpath:mapper/*.xml
+mapper:
+  mappers: com.loser.backend.club.common.mapper.BaseMapper
+pagehelper:
+  default-count: true
+
+logging:
+  config: classpath:log/log4j2-prod.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+trading-club:
+  intraday: false
+  compensate-rate: 10000
+  sync-moment: '0 33 11 ? * *'
+
+remote-call:
+  domain: 'http://trading.gateway.svc'
+  aceup:
+    domain: 'https://aceup.loserainsider.com'
+    key: 'trading'
+    secret: '7868338b883a49c58a8c0b16708ee4808265209b'
+    token-url: 'https://aceup.loserainsider.com/server/auth/oauth/token'
+
+  template:
+    of-email:
+      first-blue-loser: 'EML03_000047'
+      upgrade-bule-loser: 'EML03_000048'
+    of-short-msg:
+    of-inner-msg:
+    of-push:
+      upgrade-bule-loser: 'PUS03_000024'
+      update-client-manager: 'PUS03_000025'

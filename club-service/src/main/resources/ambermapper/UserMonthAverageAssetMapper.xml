@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.ambermapper.UserMonthAverageAssetMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.UserMonthAverageAsset">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="uid" jdbcType="VARCHAR" property="uid" />
+    <result column="ave_asset" jdbcType="NUMERIC" property="aveAsset" />
+    <result column="utime" jdbcType="TIMESTAMP" property="utime" />
+  </resultMap>
+
+  <select id="get4Evaluate" resultMap="BaseResultMap">
+    SELECT uid, ave_asset
+    FROM user_month_average_asset
+    ORDER BY uid LIMIT #{limit} OFFSET #{offset}
+  </select>
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.CustomloserMissionBindingMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.loserMissionBinding">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="VARCHAR" property="uid" />
+    <result column="mission_id" jdbcType="BIGINT" property="missionId" />
+    <result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+    <result column="utime" jdbcType="TIMESTAMP" property="utime" />
+  </resultMap>
+
+  <select id="countBindNumber" resultType="Integer">
+    select count(distinct uid) from loser_mission_binding where mission_id in
+                                                                (select id from loser_mission where benefit_inventory_id = #{benefitInventoryId} and status = 'ENABLE')
+  </select>
+
+  <select id="countBindPeople" resultType="Integer">
+    select count(1) from loser_mission_binding where mission_id in
+                                                                (select id from loser_mission where benefit_inventory_id = #{benefitInventoryId} and status = 'ENABLE')
+  </select>
+</mapper>

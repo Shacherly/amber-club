@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.loserManagerMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.loserManager">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="manager_identity" jdbcType="VARCHAR" property="managerIdentity" />
+    <result column="manager_uid" jdbcType="VARCHAR" property="managerUid" />
+    <result column="manager_name" jdbcType="VARCHAR" property="managerName" />
+    <result column="manager_email" jdbcType="VARCHAR" property="managerEmail" />
+    <result column="loser_photo" jdbcType="VARCHAR" property="loserPhoto" />
+    <result column="loser_name" jdbcType="OTHER" property="loserName" />
+    <result column="is_default" jdbcType="BIT" property="isDefault" />
+    <result column="loser_contact" jdbcType="OTHER" property="loserContact" />
+    <result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+    <result column="utime" jdbcType="TIMESTAMP" property="utime" />
+    <result column="loser_profile" jdbcType="OTHER" property="loserProfile" />
+  </resultMap>
+
+  <resultMap id="ClientMapping" type="com.loser.backend.club.pojo.ClientMapping">
+    <id column="uid" jdbcType="VARCHAR" property="uid"/>
+    <result column="manager_identity" jdbcType="VARCHAR" property="cmid"/>
+    <result column="manager_name" jdbcType="VARCHAR" property="cmname"/>
+  </resultMap>
+
+
+  <select id="getManager" resultMap="BaseResultMap">
+    SELECT * FROM loser_manager a RIGHT OUTER JOIN loser_client_relation b
+    ON a.manager_identity = b.mid
+    WHERE b.uid = #{uid}
+  </select>
+
+
+  <select id="getMappings" resultMap="ClientMapping">
+    <if test="!(uids == null or uids.size == 0)">
+      SELECT a.manager_identity, a.manager_name, b.uid
+      FROM loser_manager a
+      RIGHT OUTER JOIN loser_client_relation b
+      ON a.manager_identity = b.mid
+      WHERE b.uid IN
+      <foreach collection="uids" open="(" close=")" item="item" separator=",">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <insert id="upsertloserManager">
+    INSERT INTO loser_manager (manager_identity, manager_uid, manager_name, manager_email, loser_photo, loser_name, is_default, loser_contact, ctime, utime, loser_profile)
+    VALUES (#{managerIdentity}, #{managerUid}, #{managerName}, #{managerEmail}, #{loserPhoto}, COALESCE(#{loserName}::jsonb,'{}'::jsonb), #{isDefault}, COALESCE(#{loserContact}::jsonb,'{}'::jsonb), #{ctime}, #{utime}, COALESCE(#{loserProfile}::jsonb,'{}'::jsonb))
+     ON CONFLICT(manager_identity) DO UPDATE
+     set (manager_identity, manager_uid, manager_name, manager_email, loser_photo, loser_name, is_default, loser_contact, utime, loser_profile)
+     = (excluded.manager_identity, excluded.manager_uid, excluded.manager_name, excluded.manager_email,
+     excluded.loser_photo, excluded.loser_name, excluded.is_default, excluded.loser_contact,
+     excluded.utime, excluded.loser_profile);
+  </insert>
+</mapper>

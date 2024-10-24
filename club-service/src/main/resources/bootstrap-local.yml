@@ -1,0 +1,79 @@
+## 配置中心 配置 start
+loser:
+  confcenter:
+    enabled: true
+
+server:
+  port: 19000
+  shutdown: graceful
+  servlet:
+    context-path: /club
+  tomcat:
+    accept-count: 100
+    max-connections: 8192
+    threads:
+      max: 200
+      min-spare: 10
+
+spring:
+  datasource:
+    url: jdbc:postgresql://aws-jp-trading-allmodule-pg-nonprod.ckcvjkzxh8bd.ap-northeast-1.rds.amazonaws.com:5432/club_dev?prepareThreshold=0
+    username: club_readwrite_dev
+    password: bNlAv#Pspw6JnBo5DvV3z
+    driver-class-name: org.postgresql.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      max-active: 10
+      max-wait: 5000
+      min-idle: 5
+
+  redis:
+    host: master.aws-jp-trading-allmodule-redis-nonprod2.8loycm.apne1.cache.amazonaws.com
+    port: 6379
+    password: eMIuCk#RykeeQ9Xc)UWC50
+    lettuce:
+      pool:
+        min-idle: 0
+        max-active: 8
+        max-idle: 8
+        max-wait: 5
+        time-between-eviction-runs: 60000
+    database: 6
+    timeout: 5000
+
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-512
+      ssl.truststore.location: D:/Projects/trading/kafka.client.truststore.jks
+
+
+mybatis:
+  configuration:
+    cache-enabled: false
+  type-handlers-package: com.trading.backend.club.type
+  mapper-locations: classpath:mapper/*.xml
+mapper:
+  mappers: com.loser.backend.club.common.mapper.BaseMapper
+pagehelper:
+  default-count: true
+
+logging:
+  config: classpath:log/log4j2-local.xml
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+remote-call:
+  domain: 'https://internal-gateway-dev.loserainsider.com'
+  aceup:
+    domain: 'https://aceup-dev.loserainsider.com'
+    key: 'trading'
+    secret: '849299c172eb5c1da8c772c1bc89dd045499d450'
+    token-url: 'https://aceup-dev.loserainsider.com/server/auth/oauth/token'
+

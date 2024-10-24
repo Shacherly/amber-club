@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.loserLevelHistoryMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.loserLevelHistory">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="VARCHAR" property="uid" />
+    <result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+    <result column="target" jdbcType="VARCHAR" property="target" />
+    <result column="old_value" jdbcType="VARCHAR" property="oldValue" />
+    <result column="latest_value" jdbcType="VARCHAR" property="latestValue" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+</mapper>

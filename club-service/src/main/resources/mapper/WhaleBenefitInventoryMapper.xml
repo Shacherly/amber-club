@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loser.backend.club.mapper.loserBenefitInventoryMapper">
+  <resultMap id="BaseResultMap" type="com.loser.backend.club.domain.loserBenefitInventory">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="benefit_id" jdbcType="BIGINT" property="benefitId" />
+    <result column="benefit_title" jdbcType="OTHER" property="benefitTitle" />
+    <result column="benefit_descr" jdbcType="OTHER" property="benefitDescr" />
+    <result column="level_descr" jdbcType="OTHER" property="levelDescr" />
+    <result column="priority" jdbcType="INTEGER" property="priority" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="loser_level" jdbcType="VARCHAR" property="loserLevel" />
+    <result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="utime" jdbcType="TIMESTAMP" property="utime" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="benefit_img" jdbcType="OTHER" property="benefitImg" />
+    <result column="benefit_indicator" jdbcType="VARCHAR" property="benefitIndicator" />
+  </resultMap>
+
+  <select id="getByUid" resultMap="BaseResultMap">
+    SELECT a.*
+    FROM loser_benefit_inventory a
+           RIGHT OUTER JOIN loser_mission b ON a.id = b.benefit_inventory_id
+           RIGHT OUTER JOIN loser_mission_binding c ON b.id = c.mission_id
+    WHERE c.uid = #{uid}
+    AND a.benefit_indicator = #{benefitIndicat}
+    AND b.mission_type = #{missionType}
+    AND b.status = 'ENABLE'
+  </select>
+
+  <select id="countIvtries" resultType="java.lang.Integer">
+    SELECT COUNT (DISTINCT(a.id))
+    FROM loser_benefit_inventory a
+           RIGHT OUTER JOIN loser_mission b ON a.id = b.benefit_inventory_id
+           RIGHT OUTER JOIN loser_mission_binding c ON b.id = c.mission_id
+    WHERE c.uid = #{uid}
+    AND a.status = 'ENABLE'
+    AND b.status = 'ENABLE'
+    AND b.mission_type = #{missionType}
+  </select>
+
+</mapper>
