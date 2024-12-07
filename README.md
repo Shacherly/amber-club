@@ -1,3 +1,0 @@
-# club-service
-
-club service
